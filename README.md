@@ -10,6 +10,8 @@ Morbi vitae diam at diam pellentesque tempor. Vivamus porttitor turpis quis feli
 
 ## Expected Outcome:
 
+Insert expected outcome here
+
 ## The Pitch:
 
 Insert Pitchdeck here
