@@ -12,7 +12,7 @@ We are tackling the challenge of identifying real and fake audio recordings in p
 In this challenge, you will need to create solutions that can tell apart real and fake audio recordings of clients. You will develop tools to check if the information shared in these calls matches the client's profile. Additionally, you will need to figure out if a human voice in the recording is the actual client or an impersonator. We will provide you with a set of client profiles each with one verified authentic sample of the client's voice. Furthermore, you will receive the labels for a subset of the dataset and we expect you to provide the labels for the remaining audio clips (more details follow below).
 
 ## Audio Dataset
-You will get 400 audio recordings from 20 different clients, along with the profiles of those 20 clients. For each client, we have labeled one recording as original/true, one as AI-generated, and possibly one as a "real audio" from an impersonator (to be decided). Every audio recording (original or fake) contains the correct client name. Your task is to classify the rest of the recordings as:
+You will get 400 audio recordings from 20 different clients, along with the profiles of those 20 clients. For each client, we have labeled one recording as original/true and one as AI-generated. Every audio recording (original or fake) contains the correct client name. Your task is to classify the rest of the recordings as:
 
 - Original (real human speaking) or fake (AI-generated).
 
@@ -47,15 +47,15 @@ This score also contributes 50% to your final score.
 Your final score is calculated as the sum of your Prediction Score and Solution Score, ranging from 0 to 100.
 
 ### Hand-in
-To evaluate your prediction score, we need your classification labels in the same format as in the provided ones. Please provide the file name without the path. The order in which you list the files doesn't matter.
+To evaluate your prediction score, we need your classification labels in the same format as in the provided example. Please provide the file name without the path. The order in which you list the audios doesn't matter.
 
 
-**labels.csv Example**
+**<team_name>.csv Example**
 ```
-filename, is_human_voice, is_correct_voice, is_content_factual
-001.mp3, true, false, false
-016.mp3, true, true, true
-003.mp3, false, false, true
+rec_id, is_fake, is_factually_correct, is_impersonator
+656QZ2VWR4, True, False, False
+WGTMM9VP8Z, True, True, True
+56K4DSESF, False, False, True
 ...
 ```
 
