@@ -47,7 +47,7 @@ This score also contributes 50% to your final score.
 Your final score is calculated as the sum of your Prediction Score and Solution Score, ranging from 0 to 100.
 
 ### Hand-in
-To evaluate your prediction score, we need your classification labels in the same format as in the provided example. Please provide the file name without the path. The order in which you list the audios doesn't matter.
+To evaluate your prediction score, we need your classification labels in the same format as in the provided example. Please provide the file name without the path. The order in which you list the audios doesn't matter. Please, name your submission csv file as <team_name>.csv.
 
 
 **<team_name>.csv Example**
