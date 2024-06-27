@@ -58,6 +58,3 @@ WGTMM9VP8Z, True, True, True
 56K4DSESF, False, False, True
 ...
 ```
-
-## How to Reach Out to Us
-During the challenge, we will be active on the HackZurich Discord server ([join here](https://discord.com/invite/uMwgYS8qhC)). Send a message in the corresponding channel or DM us. We will make it clear which accounts belong to our team in the challenge channel.
