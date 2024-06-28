@@ -40,7 +40,7 @@ Additionally, correctly identifying whether a human voice belongs to the real cl
 Your total points will be converted into a score from 0 to 50, using a linear conversion. Achieving the maximum points gives a score of 50. This score accounts for 50% of your final score.
 
 ### Solution Score
-Your solution will be evaluated based on criteria like speed, efficiency, novelty, and elegance, with a potential score ranging from 0 to 50.
+Your solution will be evaluated based on criteria like efficiency, novelty, elegance and applicability within the banking sector with a potential score ranging from 0 to 50.
 This score also contributes 50% to your final score.
 
 ### Final Score
