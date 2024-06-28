@@ -3,7 +3,7 @@
 </p>
 
 # SwissHacks 2024 - Using AI against Deepfakes Challenge
-Welcome to the "Using AI against Deepfakes" Challenge. This README leads you through this challenge and contains all the relevant information. In case something is unclear don't hesitate to get in touch with us.
+Welcome to the "Using AI against Deepfakes" Challenge. This README leads you through this challenge and contains all the relevant information. In case something is unclear don't hesitate to get in touch with us on Discord https://discord.gg/QTA4QKm7.
 
 ## Motivation
 We are tackling the challenge of identifying real and fake audio recordings in phone calls between clients and Relationship Managers (RMs) because we want to ensure the highest level of security and trust in our bank's services. With the rise of advanced AI and deepfake audio, the risk of fraud and identity theft has grown, threatening both our clients and our operations. By creating effective ways to tell apart real and fake recordings, check if the information shared matches the client's profile, and spot human impersonators, we aim to strengthen our protection against fraud. This effort helps make our services safer and more reliable, showing our commitment to protecting our clients' financial and personal information.
