@@ -1,0 +1,22 @@
+#create 
+conda create -n app python=3.11
+conda activate app
+
+pip install -r requirements.txt
+# USE UV it is faster#
+# pip install uv 
+# then install requirments
+
+
+# FAKE AUDIO #
+python src/fake/train_fake.py
+python src/fake/predict.py ../audio_clips
+
+# IMPERSONATOR #
+RUN notebook to train and predict for impersonator
+
+# MATCH AUDIO to PERSON #
+python src/message.py
+
+# WEB APP #
+python app.py

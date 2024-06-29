@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Audio File</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+		.logo {
+			position: absolute;
+			top: 30px; /* Adjusts the top margin */
+			left: 30; /* Adjusts the left margin */
+			width: 300px; /* Example size, adjust as necessary */
+		}
+        #drop_zone {
+            width: 300px;
+            height: 200px;
+            border: 3px dashed #0088cc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0088cc;
+            font-size: 16px;
+            font-weight: 500;
+            background-color: white;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s;
+        }
+        .spinner {
+            display: none;
+            position: absolute;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #009688;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .results, .image-container, .audio-player-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            justify-content: center; /* Center children horizontally */
+        }
+        .result-bubble {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            background-color: #bbb;
+        }
+        .image-display, #audioPlayer {
+            width: 200px;            /* Set the width */
+            height: 200px;           /* Set the height */
+            background-size: cover;  /* Cover the entire area of the div */
+            background-position: center; /* Center the background image */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            border-radius: 10px;     /* Rounded corners */
+            border: 1px solid #ddd;  /* Border around the div */
+        }
+        #audioPlayer {
+            display: none;           /* Hide initially */
+        }
+    </style>
+</head>
+<body>
+	<img src="https://www.top-bank.ch/images/logo_540/banque-julius-baer-cie.png" alt="Julius Baer Logo" class="logo">
+	<!-- Existing content follows -->
+    <div id="drop_zone">Drop audio file here<span class="spinner"></span></div>
+    <div class="results">
+        <div class="result-bubble fake">Fake Audio</div>
+        <div class="result-bubble impostor">Impostor</div>
+        <div class="result-bubble voice-matching">Voice Matching</div>
+    </div>
+    <div class="image-container">
+        <div class="image-display"></div>
+    </div>
+    <div class="audio-player-container">
+        <audio id="audioPlayer" controls></audio>
+    </div>
+    <script>
+        var dropZone = document.getElementById('drop_zone');
+        var spinner = document.querySelector('.spinner');
+        var fakeBubble = document.querySelector('.fake');
+        var impostorBubble = document.querySelector('.impostor');
+        var voiceMatchingBubble = document.querySelector('.voice-matching');
+        var imageDisplay = document.querySelector('.image-display');
+        var audioPlayer = document.getElementById('audioPlayer');
+
+        function updateResults(fake, wrong_info, voiceMatching, imageName) {
+			console.log(fake, wrong_info, voiceMatching, imageName);
+            fakeBubble.textContent = `Fake Audio: ${fake > 0.5 ? 'Yes' : 'No'}`;
+            fakeBubble.style.backgroundColor = fake > 0.5 ? '#F44336' : '#4CAF50';
+            impostorBubble.textContent = `Impostor: ${wrong_info > 0.5 ? 'Yes' : 'No'}`;
+            impostorBubble.style.backgroundColor = wrong_info > 0.5 ? '#F44336' : '#4CAF50';
+            voiceMatchingBubble.textContent = `Voice Matching: ${voiceMatching > 0.5 ? 'No' : 'Yes'}`;
+            voiceMatchingBubble.style.backgroundColor = voiceMatching > 0.5 ? '#F44336' : '#4CAF50';
+
+            if (imageName) {
+                fetch(`images/${imageName}.jpg?${new Date().getTime()}`)
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Image loaded successfully');
+                            imageDisplay.style.backgroundImage = `url('images/${imageName}.jpg')`;
+                        } else {
+                            imageDisplay.style.backgroundImage = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to load image:', error);
+                        imageDisplay.style.backgroundImage = 'none';
+                    });
+            }
+			dropZone.addEventListener('drop', function(event) {
+				event.preventDefault();
+				dropZone.style.backgroundColor = 'white';
+				showSpinner(true);
+				var files = event.dataTransfer.files;
+				setupAudioPlayer(files[0]);  // Setup audio player immediately with the dropped file
+			
+				// Clear existing image display when a new file is dropped
+				imageDisplay.style.backgroundImage = 'none';
+			
+				var formData = new FormData();
+				formData.append('file', files[0]);
+			
+				fetch('/upload', {
+					method: 'POST',
+					body: formData
+				})
+				.then(response => response.json())
+				.then(data => {
+					showSpinner(false);
+					if (data.error) {
+						alert(data.error);
+					} else {
+						updateResults(data.fake, data.wrong_info, data.impostor, data.name);
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					showSpinner(false);
+				});
+			});
+        }
+
+        function showSpinner(show) {
+            spinner.style.display = show ? 'block' : 'none';
+        }
+
+        function setupAudioPlayer(file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                audioPlayer.src = e.target.result;
+                audioPlayer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        dropZone.addEventListener('dragover', function(event) {
+            event.preventDefault();
+            dropZone.style.backgroundColor = '#b3e5fc';
+        });
+
+        dropZone.addEventListener('dragleave', function(event) {
+            event.preventDefault();
+            dropZone.style.backgroundColor = 'white';
+        });
+
+        dropZone.addEventListener('drop', function(event) {
+            event.preventDefault();
+            dropZone.style.backgroundColor = 'white';
+            showSpinner(true);
+            var files = event.dataTransfer.files;
+            setupAudioPlayer(files[0]);  // Setup audio player immediately with the dropped file
+            var formData = new FormData();
+            formData.append('file', files[0]);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                showSpinner(false);
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    updateResults(data.fake, data.wrong_info, data.impostor, data.name);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showSpinner(false);
+            });
+        });
+    </script>
+</body>
+</html>
