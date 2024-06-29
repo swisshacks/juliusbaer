@@ -23,8 +23,8 @@ def analyse_audio(audio_path):
 	id_audio = os.path.basename(audio_path).split(".")[0]
 	print(id_audio)
 	audio_json = id_audio + ".json"
-	audio_json_path = os.path.join("/home/jolivier/juliusbaer/audio_clips", audio_json)
-	client_profiles_path = '/home/jolivier/juliusbaer/client_profiles/client_features.csv'
+	audio_json_path = os.path.join("../audio_clips", audio_json)
+	client_profiles_path = '../client_profiles/client_features.csv'
 	client_profiles = load_client_profiles(client_profiles_path)
  
 	name = process_transcript(audio_json, client_profiles)

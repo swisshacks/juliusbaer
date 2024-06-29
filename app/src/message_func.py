@@ -245,8 +245,6 @@ def process_transcripts(json_folder, client_profiles):
 	return results, failures
 
 # File paths
-# json_folder = '/home/jolivier/juliusbaer/audio_clips'
-# client_profiles_path = '/home/jolivier/juliusbaer/client_profiles/client_features.csv'
 
 # # Load client profiles from CSV
 # client_profiles = load_client_profiles(client_profiles_path)

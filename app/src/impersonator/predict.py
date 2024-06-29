@@ -27,9 +27,9 @@ def coucou():
 
 def analyse_is_impersonator(audio_file, actual_name):
 	# Directory containing the training audio files
-	directory = "/home/jolivier/juliusbaer/app/real_audio"
+	directory = "real_audio"
 	# Load client profiles
-	client_profiles = pd.read_csv("/home/jolivier/juliusbaer/client_profiles/real_match_name.csv")
+	client_profiles = pd.read_csv("../client_profiles/real_match_name.csv")
 	# Create a dictionary mapping rec_ids to file paths and client names
 	audio_files = {row['rec_id']: (os.path.join(directory, row['rec_id'] + '.wav'), row['name'])
 				for _, row in client_profiles.iterrows() if os.path.isfile(os.path.join(directory, row['rec_id'] + '.wav'))}
