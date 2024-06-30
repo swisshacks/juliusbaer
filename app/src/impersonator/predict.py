@@ -4,55 +4,78 @@ from sklearn.mixture import GaussianMixture
 from python_speech_features import mfcc
 import os
 import numpy as np
+import librosa
+import torch
+import whisper
+import scipy.io.wavfile as wav
 
-def extract_features(audio_path, trim_length=None):
-	print(audio_path)
-	sr, y = wav.read(audio_path)
-	if trim_length:
-		y = y[:trim_length * sr]  # multiplying by sr to convert seconds to samples
-	mfccs = mfcc(y, sr, numcep=13)
-	return mfccs
 
-def train_gmm(features, n_components=3):
-	gmm = GaussianMixture(n_components=n_components)
-	gmm.fit(features)
-	return gmm
+model = whisper.load_model("tiny")
 
-def load_and_process_audio(file_path):
-	features = extract_features(file_path)
-	return features
+PATH = r'app\\src\\impersonator\\gmms\\'
+files_in_path = os.listdir(PATH)
+names = set([file.split('_')[1] for file in files_in_path])
+gmms = {name: GaussianMixture(n_components = 3) for name in names}
+for name in names:
+	gmm_name = PATH + 'gmm_' + name
+	means = np.load(gmm_name + '_means.npy')
+	covar = np.load(gmm_name + '_covariances.npy')
+	gmms[name].precisions_cholesky_ = np.load(gmm_name + '_precisions_cholesky.npy')
+	gmms[name].weights_ = np.load(gmm_name + '_weights.npy')
+	gmms[name].means_ = means
+	gmms[name].covariances_ = covar
+
+
+@torch.no_grad()
+def extract_features(audio_path, 
+                     model,
+                     target_sr = 16_000):
+	
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    y, sr = librosa.load(audio_path, sr=None)
+    if sr != target_sr:
+        y = librosa.resample(y, orig_sr=sr, target_sr=target_sr)
+
+    y = y / np.max(np.abs(y))
+    valid_share = y.shape[0]
+
+    y = whisper.pad_or_trim(y)
+    valid_share /= y.shape[0]
+    mel = whisper.log_mel_spectrogram(y)
+    mel = mel.unsqueeze(0).to(device)
+    features = model.embed_audio(mel)
+    
+    return features[0, :int(valid_share * 1500) + 1:10, :].cpu()
+
+
+def get_likelihoods(audio_path, gmms, model):
+
+    likelihoods = {name: None for name in gmms.keys()}
+
+    for name, gmm in gmms.items():
+        features = extract_features(audio_path, model)
+        likelihoods[name] = gmm.score(features)
+
+    return likelihoods
+
+
+def analyze(audio_path, gmms, claimed_name, model):
+    
+        likelihoods = get_likelihoods(audio_path, gmms, model)
+        
+        highest_likelihood = max(likelihoods.values())
+        best_match = [name for name, likelihood in likelihoods.items() if likelihood == highest_likelihood][0]
+
+        if claimed_name == best_match:
+            return 0
+        else:
+            return 1
+
 
 def coucou():
 	print("coucou")
 
+
 def analyse_is_impersonator(audio_file, actual_name):
-	# Directory containing the training audio files
-	directory = "real_audio"
-	# Load client profiles
-	client_profiles = pd.read_csv("../client_profiles/real_match_name.csv")
-	# Create a dictionary mapping rec_ids to file paths and client names
-	audio_files = {row['rec_id']: (os.path.join(directory, row['rec_id'] + '.wav'), row['name'])
-				for _, row in client_profiles.iterrows() if os.path.isfile(os.path.join(directory, row['rec_id'] + '.wav'))}
 
-	gmms = {}
-	for rec_id, (file_path, name) in audio_files.items():
-		features = load_and_process_audio(file_path)
-		gmm = train_gmm(features)
-		gmms[rec_id] = gmm
-
-	# Compare results
-	results = []
-	# Get the best match
-	best_match = None
-	features = load_and_process_audio(audio_file)
-	best_score = -np.inf
-	for rec_id, gmm in gmms.items():
-		score = gmm.score(features)
-		if score > best_score:
-			best_score = score
-			best_match = rec_id
-	best_match_name = audio_files[best_match][1]
-	match_result = actual_name == best_match_name
-	#to num 
-	match_result = 0 if match_result else 1
-	return match_result
+    return analyze(audio_file, gmms, actual_name, model)
